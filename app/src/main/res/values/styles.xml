@@ -7,7 +7,7 @@
     </style>
 
     <style name="actionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#FF8800</item>
+        <item name="android:background">#ffededed</item>
     </style>
 
 </resources>

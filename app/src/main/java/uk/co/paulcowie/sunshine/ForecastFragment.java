@@ -60,6 +60,14 @@ public class ForecastFragment extends Fragment {
         weatherTask.execute(location, unitType);
     }
 
+    public void showMap(Uri geoLocation) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -72,6 +80,19 @@ public class ForecastFragment extends Fragment {
         if (id == R.id.action_refresh) {
             updateWeather();
             return true;
+        } else if (id == R.id.action_map) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String postcode = prefs.getString(getString(R.string.location_setting_key), getString(R.string.location_setting_default));
+            String URI_START = "geo:0,0?";
+
+            Uri locationUri = Uri.parse(URI_START).buildUpon()
+                    .appendQueryParameter("q", postcode)
+                    .build();
+
+            showMap(locationUri);
+            return true;
+
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -120,8 +141,8 @@ public class ForecastFragment extends Fragment {
 
         @Override
         protected String[] doInBackground(String... params) {
-            if (params.length == 0) {
-                //Fail if no postcode specified
+            if (params.length == 0 || params.length == 1) {
+                //Fail if no postcode or temperature unit selected
                 return null;
             }
 

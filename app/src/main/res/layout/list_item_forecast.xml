@@ -3,12 +3,12 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/list_item_text_view"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="60dp"
     android:autoText="false"
-    android:background="#FFBB33"
+    android:background="#ffffc600"
     android:gravity="center|left"
     android:paddingLeft="10dp"
     android:text="Today - Sunny"
-    android:textSize="20sp">
+    android:textSize="22sp">
 
 </TextView>
