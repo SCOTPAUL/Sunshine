@@ -8,4 +8,13 @@
     <string name="title_activity_detail">In Detail</string>
     <string name="settings_name">Settings</string>
 
+    <string name="location_setting_title">Location</string>
+    <string name="location_setting_key" translatable="false">location</string>
+    <string name="location_setting_default" translateable="false">PA4</string>
+
+    <string name="units_setting_title">Units</string>
+    <string name="units_setting_key" translatable="false">units</string>
+    <string name="units_setting_default" translateable="false">metric</string>
+
+
 </resources>

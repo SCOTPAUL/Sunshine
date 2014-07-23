@@ -2,9 +2,11 @@ package uk.co.paulcowie.sunshine;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,7 +27,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -50,13 +51,26 @@ public class ForecastFragment extends Fragment {
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
+    public void updateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        String[] parsedData;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.location_setting_key), getString(R.string.location_setting_default));
+        String unitType = prefs.getString(getString(R.string.units_setting_key), getString(R.string.units_setting_default));
+        weatherTask.execute(location, unitType);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            String[] parsedData;
-            weatherTask.execute("PA4");
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -67,12 +81,8 @@ public class ForecastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_sunshine, container, false);
-        String fakeData[] = {"Today - Sunny - 25", "Tomorrow - Sunny - 25",
-                "Thurs - Rainy - 28", "Fri - Sunny - 15", "Sat - Rainy - 10", "Sun - Rainy - 5",
-                "Mon - Rainy - 10", "Tues - Meteor Storm - 15", "Wed - Volcano Eruption - 2500",
-                "Thurs - End of Days - NaN"};
 
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(fakeData));
+        List<String> weekForecast = new ArrayList<String>();
 
         myArrayAdapter = new ArrayAdapter<String>(getActivity(),
                 R.layout.list_item_forecast, R.id.list_item_text_view, weekForecast);
@@ -139,6 +149,7 @@ public class ForecastFragment extends Fragment {
                         .appendQueryParameter(API_PARAM, ApiKeyHandler.OWM_KEY)
                         .build();
 
+
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
@@ -172,9 +183,13 @@ public class ForecastFragment extends Fragment {
                 }
                 forecastJsonStr = buffer.toString();
                 WeatherDataParser JSONParser = new WeatherDataParser();
+
+                //String for unit type required after parsing
+                String unitType = params[1];
                 try {
                     //Return the parsed data, accessible by onPostExecute.
-                    returnData = JSONParser.getWeatherDataFromJSONString(forecastJsonStr, 14);
+                    returnData = JSONParser.getWeatherDataFromJSONString(forecastJsonStr, 14, unitType);
+                    Log.v(LOG_TAG, unitType);
                     return returnData;
 
                 } catch (JSONException e) {

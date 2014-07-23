@@ -31,7 +31,13 @@ public class WeatherDataParser {
         return roundHigh + "/" + roundLow;
     }
 
-    public String[] getWeatherDataFromJSONString(String JSONString, int numDays)
+    private String formatImperial(double high, double low) {
+        double highImp = ((high * 9) / 5) + 32;
+        double lowImp = ((high * 9) / 5) + 32;
+        return formatTemperatures(highImp, lowImp);
+    }
+
+    public String[] getWeatherDataFromJSONString(String JSONString, int numDays, String unitType)
             throws JSONException {
         //Required fields
         final String OWM_LIST = "list";
@@ -70,7 +76,14 @@ public class WeatherDataParser {
             JSONObject temperatureObj = dayStruct.getJSONObject(OWM_TEMPERATURE);
             double highTemp = temperatureObj.getDouble(OWM_MAX);
             double lowTemp = temperatureObj.getDouble(OWM_MIN);
-            hiLow = formatTemperatures(highTemp, lowTemp);
+
+            if (unitType.equals("metric")) {
+                hiLow = formatTemperatures(highTemp, lowTemp);
+            } else if (unitType.equals("imperial")) {
+                hiLow = formatImperial(highTemp, lowTemp);
+            } else {
+                hiLow = "0/0";
+            }
 
 
             weatherStrings[i] = day + " - " + description + " - " + hiLow;
