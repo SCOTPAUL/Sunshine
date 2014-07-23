@@ -1,6 +1,7 @@
 package uk.co.paulcowie.sunshine;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -63,7 +65,7 @@ public class ForecastFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_sunshine, container, false);
         String fakeData[] = {"Today - Sunny - 25", "Tomorrow - Sunny - 25",
                 "Thurs - Rainy - 28", "Fri - Sunny - 15", "Sat - Rainy - 10", "Sun - Rainy - 5",
@@ -75,8 +77,17 @@ public class ForecastFragment extends Fragment {
         myArrayAdapter = new ArrayAdapter<String>(getActivity(),
                 R.layout.list_item_forecast, R.id.list_item_text_view, weekForecast);
 
-        ListView myListView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        final ListView myListView = (ListView) rootView.findViewById(R.id.listview_forecast);
         myListView.setAdapter(myArrayAdapter);
+        myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String weatherText = myArrayAdapter.getItem(position);
+                Intent detailIntent = new Intent().setClass(getActivity(), DetailActivity.class);
+                detailIntent.putExtra(Intent.EXTRA_TEXT, weatherText);
+                startActivity(detailIntent);
+            }
+        });
 
         return rootView;
     }
@@ -115,11 +126,17 @@ public class ForecastFragment extends Fragment {
                 final String UNITS_PARAM = "units";
                 final String DAYS_PARAM = "cnt";
 
+                //Get api key from http://openweathermap.org/appid
+                final String API_PARAM = "APPID";
+
                 myUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                         .appendQueryParameter(QUERY_PARAM, params[0])
                         .appendQueryParameter(FORMAT_PARAM, "json")
                         .appendQueryParameter(UNITS_PARAM, "metric")
                         .appendQueryParameter(DAYS_PARAM, "14")
+                                //Get api key from http://openweathermap.org/appid
+                                //Hidden class ApiKeyHandler stores api keys
+                        .appendQueryParameter(API_PARAM, ApiKeyHandler.OWM_KEY)
                         .build();
 
                 // Construct the URL for the OpenWeatherMap query
