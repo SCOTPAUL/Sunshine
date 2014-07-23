@@ -96,10 +96,6 @@ public class ForecastFragment extends Fragment {
         Uri myUri;
         private String[] returnData;
 
-        public String[] getStrings() {
-            return returnData;
-        }
-
 
         @Override
         protected String[] doInBackground(String... params) {
@@ -109,7 +105,6 @@ public class ForecastFragment extends Fragment {
             }
 
             try
-
             {
 
                 //URI Builder for openweathermap
@@ -126,8 +121,6 @@ public class ForecastFragment extends Fragment {
                         .appendQueryParameter(UNITS_PARAM, "metric")
                         .appendQueryParameter(DAYS_PARAM, "14")
                         .build();
-
-                Log.v(LOG_TAG, "URI: " + myUri.toString());
 
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
@@ -163,14 +156,12 @@ public class ForecastFragment extends Fragment {
                 forecastJsonStr = buffer.toString();
                 WeatherDataParser JSONParser = new WeatherDataParser();
                 try {
+                    //Return the parsed data, accessible by onPostExecute.
                     returnData = JSONParser.getWeatherDataFromJSONString(forecastJsonStr, 14);
-                    for (int i = 0; i < returnData.length; i++) {
-                        Log.v(LOG_TAG, returnData[i]);
-                    }
                     return returnData;
+
                 } catch (JSONException e) {
-                    //If json parsing fails, cant return string.
-                    Log.v(LOG_TAG, e.getMessage(), e);
+                    //If json parsing fails, can't return string.
                     return null;
                 }
             } catch (
@@ -179,8 +170,8 @@ public class ForecastFragment extends Fragment {
 
             {
                 Log.e("PlaceholderFragment", "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
+                // If the code didn't successfully get the weather data, there's no
+                // point in attempting to parse it.
                 return null;
             } finally
 
@@ -204,9 +195,8 @@ public class ForecastFragment extends Fragment {
             if (result != null) {
 
                 myArrayAdapter.clear();
-                for (String dayForecastStr : result) {
-                    myArrayAdapter.add(dayForecastStr);
-                }
+                myArrayAdapter.addAll(result);
+
             }
 
 

@@ -56,7 +56,6 @@ public class WeatherDataParser {
             JSONObject dayStruct = weatherArray.getJSONObject(i);
 
             //Get date for day
-
             //Produces UNIX timestamp
             long dateTime = dayStruct.getLong(OWM_DATETIME);
             day = getHumanReadableDate(dateTime);
