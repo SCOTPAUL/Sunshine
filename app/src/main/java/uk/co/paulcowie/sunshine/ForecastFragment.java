@@ -14,19 +14,24 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment {
-
     private final String LOG_TAG = ForecastFragment.class.getSimpleName();
+    private ArrayAdapter<String> myArrayAdapter;
 
     public ForecastFragment() {
     }
@@ -48,6 +53,7 @@ public class ForecastFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             FetchWeatherTask weatherTask = new FetchWeatherTask();
+            String[] parsedData;
             weatherTask.execute("PA4");
             return true;
         }
@@ -64,8 +70,10 @@ public class ForecastFragment extends Fragment {
                 "Mon - Rainy - 10", "Tues - Meteor Storm - 15", "Wed - Volcano Eruption - 2500",
                 "Thurs - End of Days - NaN"};
 
-        ArrayAdapter myArrayAdapter = new ArrayAdapter(getActivity(),
-                R.layout.list_item_forecast, R.id.list_item_text_view, fakeData);
+        List<String> weekForecast = new ArrayList<String>(Arrays.asList(fakeData));
+
+        myArrayAdapter = new ArrayAdapter<String>(getActivity(),
+                R.layout.list_item_forecast, R.id.list_item_text_view, weekForecast);
 
         ListView myListView = (ListView) rootView.findViewById(R.id.listview_forecast);
         myListView.setAdapter(myArrayAdapter);
@@ -73,27 +81,28 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
-    public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
+    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         //GOOGLE's CODE
 
         //Tag for use in Log statements.
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-
-
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-
         // Will contain the raw JSON response as a string.
         String forecastJsonStr = null;
-
         //Uri object
         Uri myUri;
+        private String[] returnData;
+
+        public String[] getStrings() {
+            return returnData;
+        }
 
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
             if (params.length == 0) {
                 //Fail if no postcode specified
                 return null;
@@ -115,7 +124,7 @@ public class ForecastFragment extends Fragment {
                         .appendQueryParameter(QUERY_PARAM, params[0])
                         .appendQueryParameter(FORMAT_PARAM, "json")
                         .appendQueryParameter(UNITS_PARAM, "metric")
-                        .appendQueryParameter(DAYS_PARAM, "7")
+                        .appendQueryParameter(DAYS_PARAM, "14")
                         .build();
 
                 Log.v(LOG_TAG, "URI: " + myUri.toString());
@@ -152,6 +161,18 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
+                WeatherDataParser JSONParser = new WeatherDataParser();
+                try {
+                    returnData = JSONParser.getWeatherDataFromJSONString(forecastJsonStr, 14);
+                    for (int i = 0; i < returnData.length; i++) {
+                        Log.v(LOG_TAG, returnData[i]);
+                    }
+                    return returnData;
+                } catch (JSONException e) {
+                    //If json parsing fails, cant return string.
+                    Log.v(LOG_TAG, e.getMessage(), e);
+                    return null;
+                }
             } catch (
                     IOException e
                     )
@@ -175,12 +196,22 @@ public class ForecastFragment extends Fragment {
                     }
                 }
             }
-            Log.v(LOG_TAG, "Buffer: " + forecastJsonStr);
-            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result != null) {
+
+                myArrayAdapter.clear();
+                for (String dayForecastStr : result) {
+                    myArrayAdapter.add(dayForecastStr);
+                }
+            }
+
+
         }
     }
-
-
 }
 
 
