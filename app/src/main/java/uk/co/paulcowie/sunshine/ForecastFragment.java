@@ -52,17 +52,21 @@ public class ForecastFragment extends Fragment {
     }
 
     public void updateWeather() {
+        //Fetch weather from OpenWeatherMap
         FetchWeatherTask weatherTask = new FetchWeatherTask();
-        String[] parsedData;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String location = prefs.getString(getString(R.string.location_setting_key), getString(R.string.location_setting_default));
         String unitType = prefs.getString(getString(R.string.units_setting_key), getString(R.string.units_setting_default));
+
+        //Use asynctask to get data
         weatherTask.execute(location, unitType);
     }
 
     public void showMap(Uri geoLocation) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
+
+        //If there is an app to get the map request...
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivity(intent);
         }
@@ -81,7 +85,10 @@ public class ForecastFragment extends Fragment {
             updateWeather();
             return true;
         } else if (id == R.id.action_map) {
+            //Send an intent to open a map at postcode set in settings
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+            //Default to PA4 if no location set
             String postcode = prefs.getString(getString(R.string.location_setting_key), getString(R.string.location_setting_default));
             String URI_START = "geo:0,0?";
 
@@ -94,6 +101,7 @@ public class ForecastFragment extends Fragment {
 
 
         }
+        //Pass all other clicks to the super class
         return super.onOptionsItemSelected(item);
     }
 
@@ -110,9 +118,13 @@ public class ForecastFragment extends Fragment {
 
         final ListView myListView = (ListView) rootView.findViewById(R.id.listview_forecast);
         myListView.setAdapter(myArrayAdapter);
+
+        //On list item click...
         myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Send an intent to DetailActivity, starting it and passing in the data held by
+                //the list item.
                 String weatherText = myArrayAdapter.getItem(position);
                 Intent detailIntent = new Intent().setClass(getActivity(), DetailActivity.class);
                 detailIntent.putExtra(Intent.EXTRA_TEXT, weatherText);
@@ -247,6 +259,9 @@ public class ForecastFragment extends Fragment {
         protected void onPostExecute(String[] result) {
             if (result != null) {
 
+
+                //Set the array adapter to hold the contents of the returned
+                //weather data once it has been fetched
                 myArrayAdapter.clear();
                 myArrayAdapter.addAll(result);
 
