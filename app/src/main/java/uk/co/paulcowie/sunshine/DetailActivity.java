@@ -4,15 +4,20 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 public class DetailActivity extends Activity {
 
+    private static String weatherText;
+    private final String LOG_TAG = DetailActivity.class.getSimpleName();
+    private ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +30,27 @@ public class DetailActivity extends Activity {
 
         }
 
+        Intent intent = this.getIntent();
+        weatherText = intent.getStringExtra(Intent.EXTRA_TEXT);
+
+
+    }
+
+    private void setShareIntent(Intent shareIntent) {
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
+    }
+
+    private Intent createIntent() {
+        Log.v(LOG_TAG, "Dun");
+        TextView weatherTextView = (TextView) findViewById(R.id.weather_data_text);
+        String weatherText = weatherTextView.getText() + " #SunShineApp";
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, weatherText);
+        Log.v(LOG_TAG, weatherText);
+        shareIntent.setType("text/plain");
+        return shareIntent;
 
     }
 
@@ -33,6 +59,11 @@ public class DetailActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.detail, menu);
+        MenuItem menuItemSharer = menu.findItem(R.id.action_share);
+        mShareActionProvider = (ShareActionProvider) menuItemSharer.getActionProvider();
+        mShareActionProvider.setShareIntent(createIntent());
+
+
         return true;
     }
 
@@ -46,6 +77,12 @@ public class DetailActivity extends Activity {
             Intent settingsIntent = new Intent().setClass(this, SettingsActivity.class);
             startActivity(settingsIntent);
             return true;
+        }
+        if (id == R.id.action_share) {
+
+            return true;
+
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -63,13 +100,14 @@ public class DetailActivity extends Activity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-            Intent intent = getActivity().getIntent();
-            String weatherText = intent.getStringExtra(Intent.EXTRA_TEXT);
+
             TextView weatherTextView = (TextView) rootView.findViewById(R.id.weather_data_text);
             weatherTextView.setText(weatherText);
 
 
             return rootView;
         }
+
+
     }
 }
