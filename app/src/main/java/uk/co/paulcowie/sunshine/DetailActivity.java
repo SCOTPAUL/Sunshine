@@ -31,9 +31,6 @@ public class DetailActivity extends Activity {
     }
 
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
     public static class DetailFragment extends Fragment {
 
         //Identifier used for creating logs
@@ -71,11 +68,6 @@ public class DetailActivity extends Activity {
             return rootView;
         }
 
-        private void setShareIntent(Intent shareIntent) {
-            if (mShareActionProvider != null) {
-                mShareActionProvider.setShareIntent(shareIntent);
-            }
-        }
 
         private Intent createWeatherTextIntent() {
             //Create an implicit share intent to send to other apps
@@ -114,12 +106,8 @@ public class DetailActivity extends Activity {
                 Intent settingsIntent = new Intent().setClass(getActivity(), SettingsActivity.class);
                 startActivity(settingsIntent);
                 return true;
-            }
-            if (id == R.id.action_share) {
-
+            } else if (id == R.id.action_share) {
                 return true;
-
-
             }
             return super.onOptionsItemSelected(item);
 

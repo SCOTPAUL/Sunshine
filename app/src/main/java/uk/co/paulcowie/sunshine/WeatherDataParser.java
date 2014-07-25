@@ -19,7 +19,7 @@ public class WeatherDataParser {
         //*1000 to get ms
         Date date = new Date(time * 1000);
         SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
-        return format.format(date).toString();
+        return format.format(date);
 
     }
 
@@ -33,7 +33,7 @@ public class WeatherDataParser {
 
     private String formatImperial(double high, double low) {
         double highImp = ((high * 9) / 5) + 32;
-        double lowImp = ((high * 9) / 5) + 32;
+        double lowImp = ((low * 9) / 5) + 32;
         return formatTemperatures(highImp, lowImp);
     }
 
