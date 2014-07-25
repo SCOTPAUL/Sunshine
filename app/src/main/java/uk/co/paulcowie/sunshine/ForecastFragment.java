@@ -44,7 +44,9 @@ public class ForecastFragment extends Fragment {
         super.onCreate(savedInstance);
         //Handle options in menu
         setHasOptionsMenu(true);
+        Log.v(LOG_TAG, "Created");
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -75,8 +77,34 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        Log.v(LOG_TAG, "Started");
         updateWeather();
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.v(LOG_TAG, "Stopped");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.v(LOG_TAG, "Destroyed");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.v(LOG_TAG, "Paused");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.v(LOG_TAG, "Resumed");
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
