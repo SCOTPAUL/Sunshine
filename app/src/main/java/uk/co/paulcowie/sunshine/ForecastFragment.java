@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.json.JSONException;
@@ -29,12 +28,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.paulcowie.sunshine.util.ForecastListAdapter;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment {
     private final String LOG_TAG = ForecastFragment.class.getSimpleName();
-    private ArrayAdapter<String> myArrayAdapter;
+    private ForecastListAdapter myArrayAdapter;
 
     public ForecastFragment() {
     }
@@ -141,8 +142,7 @@ public class ForecastFragment extends Fragment {
 
         List<String> weekForecast = new ArrayList<String>();
 
-        myArrayAdapter = new ArrayAdapter<String>(getActivity(),
-                R.layout.list_item_forecast, R.id.list_item_text_view, weekForecast);
+        myArrayAdapter = new ForecastListAdapter(getActivity(), weekForecast);
 
         final ListView myListView = (ListView) rootView.findViewById(R.id.listview_forecast);
         myListView.setAdapter(myArrayAdapter);
@@ -164,8 +164,6 @@ public class ForecastFragment extends Fragment {
     }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
-        //GOOGLE's CODE
-
         //Tag for use in Log statements.
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
         // These two need to be declared outside the try/catch
@@ -183,6 +181,7 @@ public class ForecastFragment extends Fragment {
         protected String[] doInBackground(String... params) {
             if (params.length == 0 || params.length == 1) {
                 //Fail if no postcode or temperature unit selected
+                Log.v(LOG_TAG, "Parameters not correctly set");
                 return null;
             }
 
@@ -223,7 +222,7 @@ public class ForecastFragment extends Fragment {
 
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 if (inputStream == null) {
                     // Nothing to do.
                     return null;
@@ -235,11 +234,12 @@ public class ForecastFragment extends Fragment {
                     // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                     // But it does make debugging a *lot* easier if you print out the completed
                     // buffer for debugging.
-                    buffer.append(line + "\n");
+                    buffer.append(line).append("\n");
                 }
 
                 if (buffer.length() == 0) {
                     // Stream was empty.  No point in parsing.
+                    Log.v(LOG_TAG, "Buffer empty");
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
@@ -249,17 +249,16 @@ public class ForecastFragment extends Fragment {
                 String unitType = params[1];
                 try {
                     //Return the parsed data, accessible by onPostExecute.
-                    returnData = JSONParser.getWeatherDataFromJSONString(forecastJsonStr, 14, unitType);
+                    returnData = JSONParser.getWeatherDataFromJSONString(forecastJsonStr, unitType);
                     Log.v(LOG_TAG, unitType);
                     return returnData;
 
                 } catch (JSONException e) {
                     //If json parsing fails, can't return string.
+                    Log.e(LOG_TAG, "JSON parsing failed", e);
                     return null;
                 }
-            } catch (
-                    IOException e
-                    )
+            } catch (IOException e)
 
             {
                 Log.e("PlaceholderFragment", "Error ", e);
@@ -284,14 +283,17 @@ public class ForecastFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String[] result) {
-            if (result != null) {
-
-
+        protected void onPostExecute(String[] results) {
+            if (results != null) {
                 //Set the array adapter to hold the contents of the returned
                 //weather data once it has been fetched
                 myArrayAdapter.clear();
-                myArrayAdapter.addAll(result);
+                Log.v(LOG_TAG, String.valueOf(results.length) + " items retrieved");
+
+                for (String result : results) {
+                    myArrayAdapter.add(result);
+                }
+
 
             }
 

@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/list_item_text_view"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:autoText="false"
-    android:background="#ffffc600"
-    android:gravity="center|left"
+    android:background="@color/list_item_color"
     android:paddingLeft="10dp"
-    android:text="Today - Sunny"
     android:textSize="22sp">
 
-</TextView>
+    <TextView
+        android:id="@+id/left_icon"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center|left"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/text_box"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/left_icon"
+        android:gravity="center|left"
+        android:textSize="22sp" />
+
+</RelativeLayout>

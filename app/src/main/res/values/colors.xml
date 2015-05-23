@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="actionbar_color" type="color">#FF33B5E5</item>
+    <item name="statusbar_color" type="color">#ff1e6884</item>
+    <item name="list_item_color" type="color">#ff4d4e52</item>
+    <item name="background_color" type="color">#ffd9d9db</item>
+
+    <integer-array name="androidcolors">
+        <item>@color/actionbar_color</item>
+        <item>@color/statusbar_color</item>
+        <item>@color/list_item_color</item>
+        <item>@color/background_color</item>
+    </integer-array>
+</resources>

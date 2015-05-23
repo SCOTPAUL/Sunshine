@@ -1,13 +1,15 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="@android:style/Theme.Holo.Light">
+    <style name="AppTheme" parent="@android:style/Theme.Material">
         <!-- Customize your theme here. -->
-        <item name="android:actionBarStyle">@style/actionBarStyle</item>
+        <item name="android:colorPrimary">@color/actionbar_color</item>
+        <item name="android:colorPrimaryDark">@color/statusbar_color</item>
+        <item name="android:windowBackground">@color/background_color</item>
     </style>
 
-    <style name="actionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#ffededed</item>
+    <style name="TransparentAppTheme" parent="AppTheme">
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
 </resources>

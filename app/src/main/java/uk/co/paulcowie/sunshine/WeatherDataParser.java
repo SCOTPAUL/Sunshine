@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -37,7 +38,7 @@ public class WeatherDataParser {
         return formatTemperatures(highImp, lowImp);
     }
 
-    public String[] getWeatherDataFromJSONString(String JSONString, int numDays, String unitType)
+    public String[] getWeatherDataFromJSONString(String JSONString, String unitType)
             throws JSONException {
         //Required fields
         final String OWM_LIST = "list";
@@ -51,7 +52,7 @@ public class WeatherDataParser {
         JSONObject forecastJSON = new JSONObject(JSONString);
         JSONArray weatherArray = forecastJSON.getJSONArray(OWM_LIST);
 
-        String weatherStrings[] = new String[numDays];
+        ArrayList<String> weatherStrings = new ArrayList<String>();
 
         for (int i = 0; i < weatherArray.length(); i++) {
             String day;
@@ -86,11 +87,11 @@ public class WeatherDataParser {
             }
 
 
-            weatherStrings[i] = day + " - " + description + " - " + hiLow;
+            weatherStrings.add(day + " - " + description + " - " + hiLow);
 
 
         }
-        return weatherStrings;
+        return weatherStrings.toArray(new String[weatherStrings.size()]);
     }
 
 }
